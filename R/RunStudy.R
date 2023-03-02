@@ -233,7 +233,6 @@ runStudy <- function(connectionDetails = NULL,
   data <- DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T)
   
   #calculate locality metrics for Time to Treatment Switch
-  browser()
   metrics <- data %>%
     dplyr::filter(event == 1) %>% 
     dplyr::select(cohortDefinitionId, timeToEvent) %>% 
@@ -308,7 +307,6 @@ runStudy <- function(connectionDetails = NULL,
   # median follow-up time
   ParallelLogger::logInfo("Time periods locality estimation")
   start <- Sys.time()
-  browser()
 
   sqlAggreg <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
                                                  sqlFilename = file.path("quartiles", "QuartilesAggregation.sql"),
