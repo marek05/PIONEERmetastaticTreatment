@@ -195,8 +195,13 @@ runStudy <- function(connectionDetails = NULL,
                                   events = events,
                                   databaseId = databaseId,
                                   packageName = getThisPackageName())
-  andrData$cohort_time_to_event <- timeToEvent
-  
+  if (nrow(timeToEvent)>0){
+    andrData$cohort_time_to_event <- timeToEvent
+  }
+  else (
+    ParallelLogger::logInfo("No results from timeToEvent. All the target cohort counts are to low (<30) or no outcome events.")
+  )  
+
   delta <- Sys.time() - start
   ParallelLogger::logInfo(paste("Generating time to event data took",
                                 signif(delta, 3),
@@ -255,9 +260,14 @@ runStudy <- function(connectionDetails = NULL,
                n.censor = surv_info$n.censor, n.event = surv_info$n.event, n.risk = surv_info$n.risk,
                lower = surv_info$lower, upper = surv_info$upper, databaseId = databaseId)
   })
-  andrData$cohort_time_to_treatment_switch <- timeToTreatmentSwitch
   
-  
+  if (nrow(timeToTreatmentSwitch)>0){
+    andrData$cohort_time_to_treatment_switch <- timeToTreatmentSwitch
+  }
+  else (
+    ParallelLogger::logInfo("No results from timeToTreatmentSwitch. All the target cohort counts are to low (<30) or no treatment switch events.")
+  )  
+
   ParallelLogger::logInfo("Get sankey data")
   sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
                                            sqlFilename = "Sankey.sql",
