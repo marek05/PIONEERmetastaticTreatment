@@ -609,6 +609,12 @@
 			"Source" : "Repository",
 			"Repository" : "CRAN"
 		},
+		"plyr" : {
+		  "Package" : "plyr",
+		  "Version" : "1.8.6",
+		  "Source" : "Repository",
+		  "Repository" : "CRAN"
+		},
 		"jpeg" : {
 			"Package" : "jpeg",
 			"Version" : "0.1-9",

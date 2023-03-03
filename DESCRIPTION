@@ -46,6 +46,7 @@ Suggests:
     shinydashboard,
     shinyWidgets,
     VennDiagram,
+    plyr,
     ggiraph,
     DT,
     pool
