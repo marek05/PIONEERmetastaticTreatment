@@ -180,23 +180,23 @@ runCohortDiagnostics(connectionDetails = connectionDetails,
 # 
 # # Use this to run the study. The results will be stored in a zip file called
 # # 'Results_<databaseId>.zip in the outputFolder.
-# runStudy(connectionDetails = connectionDetails,
-#          cdmDatabaseSchema = cdmDatabaseSchema,
-#          cohortDatabaseSchema = cohortDatabaseSchema,
-#          cohortStagingTable = cohortStagingTable,
-#          cohortTable = cohortTable,
-#          featureSummaryTable = featureSummaryTable,
-#          oracleTempSchema = cohortDatabaseSchema,
-#          exportFolder = outputFolder,
-#          databaseId = databaseId,
-#          databaseName = databaseName,
-#          databaseDescription = databaseDescription,
-#          #cohortGroups = c("target"), # Optional - will use all groups by default
-#          cohortIdsToExcludeFromExecution = cohortIdsToExcludeFromExecution,
-#          cohortIdsToExcludeFromResultsExport = cohortIdsToExcludeFromResultsExport,
-#          incremental = TRUE,
-#          useBulkCharacterization = useBulkCharacterization,
-#          minCellCount = minCellCount)
+ runStudy(connectionDetails = connectionDetails,
+          cdmDatabaseSchema = cdmDatabaseSchema,
+          cohortDatabaseSchema = cohortDatabaseSchema,
+          cohortStagingTable = cohortStagingTable,
+          cohortTable = cohortTable,
+          featureSummaryTable = featureSummaryTable,
+          oracleTempSchema = cohortDatabaseSchema,
+          exportFolder = outputFolder,
+          databaseId = databaseId,
+          databaseName = databaseName,
+          databaseDescription = databaseDescription,
+          #cohortGroups = c("target"), # Optional - will use all groups by default
+          cohortIdsToExcludeFromExecution = cohortIdsToExcludeFromExecution,
+          cohortIdsToExcludeFromResultsExport = cohortIdsToExcludeFromResultsExport,
+          incremental = TRUE,
+          useBulkCharacterization = useBulkCharacterization,
+          minCellCount = minCellCount)
 # 
 # 
 # # Use the next set of commands to compress results
