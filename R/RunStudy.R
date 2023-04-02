@@ -307,7 +307,57 @@ runStudy <- function(connectionDetails = NULL,
   # median follow-up time
   ParallelLogger::logInfo("Time periods locality estimation")
   start <- Sys.time()
+  
+  ParallelLogger::logInfo("Creating auxiliary tables")
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = file.path("quartiles", "IQRComplementaryTables.sql"),
+                                           packageName = getThisPackageName(),
+                                           warnOnMissingParameters = TRUE,
+                                           cdm_database_schema = cdmDatabaseSchema,
+                                           cohort_database_schema = cohortDatabaseSchema,
+                                           cohort_table = cohortTable,
+                                           target_ids = paste(targetIds, collapse = ', '))
+  DatabaseConnector::executeSql(connection, sql)
+  
+  
+  sqlAggreg <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                                 sqlFilename = file.path("quartiles", "QuartilesAggregation.sql"),
+                                                 packageName = getThisPackageName(),
+                                                 warnOnMissingParameters = TRUE,
+                                                 analysis_name = "Age at Diagnosis")
+  
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = file.path("quartiles", "AgeAtDiagnosis.sql"),
+                                           packageName = getThisPackageName(),
+                                           warnOnMissingParameters = TRUE,
+                                           cohort_database_schema = cohortDatabaseSchema,
+                                           cohort_table = cohortTable,
+                                           target_ids = paste(targetIds, collapse = ', '))
+  
+  sql <- paste0(sql, sqlAggreg)
+  metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
 
+  
+  
+  sqlAggreg <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                                 sqlFilename = file.path("quartiles", "QuartilesAggregation.sql"),
+                                                 packageName = getThisPackageName(),
+                                                 warnOnMissingParameters = TRUE,
+                                                 analysis_name = "CCI at Diagnosis")
+  
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = file.path("quartiles", "CharlsonAtDiagnosis.sql"),
+                                           packageName = getThisPackageName(),
+                                           warnOnMissingParameters = TRUE,
+                                           cohort_database_schema = cohortDatabaseSchema,
+                                           cohort_table = cohortTable,
+                                           target_ids = paste(targetIds, collapse = ', '))
+  
+  sql <- paste0(sql, sqlAggreg)
+  metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
+  
+  
+  
   sqlAggreg <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
                                                  sqlFilename = file.path("quartiles", "QuartilesAggregation.sql"),
                                                  packageName = getThisPackageName(),
@@ -325,6 +375,8 @@ runStudy <- function(connectionDetails = NULL,
   sql <- paste0(sql, sqlAggreg)
   metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
  
+  
+  
   sqlAggreg <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
                                                  sqlFilename = file.path("quartiles", "QuartilesAggregation.sql"),
                                                  packageName = getThisPackageName(),
@@ -352,6 +404,12 @@ runStudy <- function(connectionDetails = NULL,
                                            warnOnMissingParameters = TRUE,
                                            cohort_database_schema = cohortDatabaseSchema
                                           )
+  DatabaseConnector::executeSql(connection, sql)
+  
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = file.path("quartiles", "RemoveComplementaryTables.sql"),
+                                           packageName = getThisPackageName(),
+                                           cohort_database_schema = cohortDatabaseSchema)
   DatabaseConnector::executeSql(connection, sql)
   
   # Counting cohorts -----------------------------------------------------------------------
