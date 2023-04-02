@@ -491,6 +491,10 @@ runStudy <- function(connectionDetails = NULL,
   # one run of the package.
   andrData$covariate_value <- andrData$covariate_value %>% dplyr::distinct()
   
+  # add versioning info to data
+  version = data.frame(version = as.character(packageVersion('PioneermetastaticTreatment')))
+  andrData$version <- version
+  
   
   # # Export to zip file -------------------------------------------------------------------------------
   # exportResults(exportFolder, databaseId, cohortIdsToExcludeFromResultsExport)
@@ -499,6 +503,8 @@ runStudy <- function(connectionDetails = NULL,
   #                               signif(delta, 3),
   #                               attr(delta, "units")))
   Andromeda::saveAndromeda(andrData, file.path(exportFolder, "study_results.zip"))
+  
+
 }
 
 #' @export

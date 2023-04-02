@@ -1,7 +1,7 @@
 Type: Package
 Package: PIONEERmetastaticTreatment
 Title: PIONEER / EHDEN / OHDSI prostate cancer study
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Anthony G.", "Sena", , "asena5@its.jnj.com", role = "aut"),
     person("Artem", "Gorbachev", , "artem.gorbachev@odysseusinc.com", role = "aut"),
