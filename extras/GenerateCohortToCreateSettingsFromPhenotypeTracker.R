@@ -25,7 +25,7 @@ library(tidyverse, warn.conflicts = FALSE)
 cols <- c('Pheno ID', 'Phenotype name', 'Intended use', 'Where <link to PIONEER CENTRAL ATLAS>')
 cohorts_base_url <- 'https://pioneer.hzdr.de/atlas/#/cohortdefinition/'
 wepapi_base_url <- 'https://pioneer.hzdr.de/WebAPI'
-bearer <- "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhcnRlbS5nb3JiYWNoZXZAb2R5c3NldXNpbmMuY29tIiwiZXhwIjoxNjY5MTA3OTAyfQ.d4hGbKOeEX-4BnQo_Rqj5zjBIJau3oKpiEFQwfvstWg1tism_MTvwxFxqxhxgA3muUsEiySgmRr-s-boi3F2zQ"
+bearer <- "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhcnRlbS5nb3JiYWNoZXZAb2R5c3NldXNpbmMuY29tIiwiZXhwIjoxNjgwNDg3MTM0fQ.aqDX3cZ7KgxgOdfjzCZjuDWpOI9rpG9o0rOiP21eZJyU-hX6Bc_lumbzkrQlvkJMF-5YeiwKT_FuRErwpgGbPQ"
 ROhdsiWebApi::setAuthHeader(wepapi_base_url, bearer)
 
 cohort_types <- c('t', 'o', 's')
@@ -77,6 +77,13 @@ for (i in 1:nrow(phenotypes)) {
              print(w)
            }
     )
+}
+
+duplicates <- phenotypes[(duplicated(phenotypes$AtlasId)), c('AtlasId', 'Name')]
+if (nrow(duplicates > 0)){
+  writeLines('Duplicated cohort definitions:')
+  print(duplicates)
+  stop()
 }
 
 
