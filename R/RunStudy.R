@@ -394,6 +394,7 @@ runStudy <- function(connectionDetails = NULL,
   
   sql <- paste0(sql, sqlAggreg)
   metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
+  metrics <- metrics %>% dplyr::mutate(databaseId = databaseId) 
 
   andrData$metrics_distribution <- metrics
 
