@@ -273,7 +273,11 @@ dashboardPage(
                      plotOutput("timeToTreatmentSwitchPlot", height = 560, width = 900)),
                    div(
                      h5('Treatment Switch Pathways'),
-                     uiOutput("pathwaysD3"))
+                     div(class = 'sankey-container',
+                        uiOutput("pathwaysD3"),
+                        dataTableOutput("sankeyTable")
+                        )
+                     )
                   )
       ),
       tabItem(tabName = "databaseInformation",

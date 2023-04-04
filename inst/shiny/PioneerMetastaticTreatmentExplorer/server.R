@@ -740,19 +740,21 @@ shinyServer(function(input, output, session) {
     paste(input$targetTreatmentPatterns, input$strataTreatmentPatterns, sep = " ")
   })
   
-  #Sankey
-  sendSankeyData <- function(){
+  
+  sankeyData <- reactive({
     target_id <- andrData$cohort_count %>%
       dplyr::filter(databaseId %in% !!input$databasesTreatmentPatterns, cohortId %in% !!cohortIdTreatmentPatterns()) %>%
       dplyr::pull(cohortId)
     
-    # if (length(target_id) == 0 | is.null(input$KMPlot)) { ggplot2::ggplot() }
-    
     sankeyData <- andrData$treatment_sankey %>%
       dplyr::filter(cohortId == target_id, databaseId == !!input$databasesTreatmentPatterns) %>%
       dplyr::collect()
-
-    jsonData <- jsonlite::toJSON(sankeyData, pretty = TRUE)
+    sankeyData
+  })
+  
+  #Sankey
+  sendSankeyData <- function(){
+    jsonData <- jsonlite::toJSON(sankeyData(), pretty = TRUE)
     session$sendCustomMessage(type = "jsondata", jsonData)
   }
 
@@ -767,6 +769,16 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$strataTreatmentPatterns, {
     sendSankeyData()
+  })
+  
+  
+  #Sankey Table
+  output$sankeyTable <- renderDataTable({
+    DT::datatable(
+    sankeyData() %>% 
+      dplyr::select(sourceName, targetName, value) %>% 
+      dplyr::arrange(sourceName, desc(value)),
+    options = list(pageLength = 25))
   })
   
   

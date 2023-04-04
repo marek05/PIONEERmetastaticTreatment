@@ -299,7 +299,7 @@ $(document).ready(function(){
     
     const margin = {top: 10, right: 10, bottom: 10, left: 10},
         width = 900 - margin.left - margin.right,
-        height = 800 - margin.top - margin.bottom;
+        height = 950 - margin.top - margin.bottom;
     
     const formatNumber = d3.format(",.0f")    // zero decimal places
     const format = function(d) { return formatNumber(d) + " " + units; };
@@ -317,7 +317,7 @@ $(document).ready(function(){
     // Set the sankey diagram properties
     const sankey = d3.sankey()
         .nodeWidth(36)
-        .nodePadding(40)
+        .nodePadding(20)
         .size([width, height]);
     
     const path = sankey.link();
@@ -335,7 +335,7 @@ $(document).ready(function(){
                              "from"   : d.sourceName,
                              "to"     : d.targetName })
           });
-          
+  
     nodes_grouped = d3.nest()
        .key(function (d) { return d.id })
        .map(graph.nodes);
@@ -356,7 +356,7 @@ $(document).ready(function(){
     graph.nodes.forEach(function (d, i) {
        graph.nodes[i] = { "id": d, "name": nodes_grouped[d][0]['name'] };
       });
-    
+      
     sankey
       .nodes(graph.nodes)
       .links(graph.links)
@@ -400,7 +400,7 @@ $(document).ready(function(){
     		    return d3.rgb(d.color).darker(2); })
         .append("title")
         .text(function(d) {
-    		    return d.id + "\n" + format(d.value); });
+    		    return d.name + "\n" + format(d.value); });
     
     // add in the title for the nodes
     node.append("text")

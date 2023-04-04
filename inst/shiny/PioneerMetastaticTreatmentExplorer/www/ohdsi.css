@@ -67,3 +67,14 @@ ul.dropdown-shinyWidgets > li {
   display: flex;
   flex-flow: column-reverse;
 }
+
+.sankey-container {
+  display: flex;
+}
+
+#pathwaysD3 {
+  padding-top: 80px;
+  padding-right: 30px;
+}
+
+
