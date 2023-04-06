@@ -313,54 +313,39 @@ shinyServer(function(input, output, session) {
       dplyr::filter(databaseId %in% !!input$databasesTimeToEvent, cohortId %in% !!cohortIdTimeToEvent()) %>% 
       dplyr::pull(cohortId)
 
-    if (length(target_id) == 0 | is.null(input$KMPlot)) { ggplot2::ggplot() }
+    if (length(target_id) == 0 | is.null(input$KMPlot)) { return(ggplot2::ggplot()) }
     
-    targetIdTimeToEventData <- andrData$cohort_time_to_event %>% 
-      dplyr::filter(targetId == target_id, databaseId == !!input$databasesTimeToEvent)
-    
-    accumulatedData <- data.table(time = c(), surv = c(), n.censor = c(), 
-                                  n.event = c(), upper = c(), lower = c())
-    for (plotName in input$KMPlot){
-      eId <- KMIds %>%
-        dplyr::filter(name == plotName) %>%
-        dplyr::pull(eventId)
-      data <- targetIdTimeToEventData %>%
-        dplyr::filter(eventId == eId) %>%
-        dplyr::collect()
-      if (nrow(data) > 0) {
-        data <- as.data.frame(data[, c('time', 'surv', 'n.risk',  'n.censor', 'n.event', 'upper', 'lower')])
-        data$strata <- plotName
-      }
-      else{
-        next()
-      }
-      accumulatedData <- rbind(accumulatedData, data)
-    }
-    
-    # eventIds <- KMIds %>% 
-    #   dplyr::filter(name %in% !!input$KMPlot) %>% 
-    #   dplyr::pull(eventId)
-    # 
-    # accumulatedData <- targetIdTimeToEventData %>% 
-    #   dplyr::filter(eventId %in% eventIds) %>% 
-    #   dplyr::collect(time, surv, n.risk, n.censor, n.event, upper, lower)
+    events <- KMIds %>%
+      dplyr::filter(name %in% !!input$KMPlot) %>%
+      dplyr::pull(eventId)
+
+    targetIdTimeToEventData <- andrData$cohort_time_to_event %>%
+      dplyr::filter(targetId == target_id,
+                    databaseId == !!input$databasesTimeToEvent,
+                    eventId %in% events) %>%
+      dplyr::collect() %>%
+      dplyr::inner_join(KMIds, by = 'eventId') %>%
+      dplyr::rename(strata = name) %>%
+      dplyr::arrange(strata, time) %>% 
+      dplyr::select(time, surv, n.risk, n.censor, n.event, upper, lower, strata)
+    targetIdTimeToEventData <- as.data.frame(targetIdTimeToEventData) 
 
     color_map <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-    names(color_map) <- KMIds$name
-   
-    plot <- ggsurvplot_core(accumulatedData,
-                            risk.table = "nrisk_cumcensor",
-                            palette = color_map,
-                            legend.labs = input$KMPlot,
-                            cmap = color_map,
-                            conf.int = TRUE,
-                            legend.title = 'Event',
-                            ylim = c(min(accumulatedData$lower), 1),
-                            ggtheme = ggplot2::theme_bw()
-                  )
+    names(color_map) <- sort(KMIds$name)
+    
+    plot <- ggsurvplot_core(
+      targetIdTimeToEventData,
+      risk.table = "nrisk_cumcensor",
+      palette = color_map,
+      legend.labs = sort(input$KMPlot),
+      cmap = color_map,
+      conf.int = TRUE,
+      legend.title = 'Event',
+      ylim = c(min(targetIdTimeToEventData$lower), 1),
+      ggtheme = ggplot2::theme_bw()
+      )
     return(plot)
   })
-  
   
   
   # Metrics Distribution
