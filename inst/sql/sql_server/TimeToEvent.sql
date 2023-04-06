@@ -1,5 +1,5 @@
 SELECT cohort_definition_id AS target_id, 
-       row_number() OVER (PARTITION BY cohort_definition_id) AS id,
+       ROW_NUMBER() OVER (PARTITION BY cohort_definition_id ORDER BY cohort_start_date) AS id,
        DATEDIFF(day, cohort_start_date, event_date) AS time_to_event,
        event
 FROM (
