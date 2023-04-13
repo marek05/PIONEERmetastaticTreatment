@@ -153,7 +153,7 @@ domain$name <- as.character(domain$name)
 domainName <- "All"
 
 # This must match the featureTimeWindow.csv from the Pioneer study
-timeWindow <- data.table(windowId = c(1:4), name = c("0 to 365d", "1y to 3y", "3y to 5y", "5y+"))
+timeWindow <- data.table(windowId = c(1:5), name = c("-365d to 0", "0 to 365d", "1y to 3y", "3y to 5y", "5y+"))
 timeWindow$name <- as.character(timeWindow$name)
 
 cohortXref <- data.table::fread("./cohortXref.csv")
