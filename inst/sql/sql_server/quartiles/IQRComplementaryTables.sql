@@ -194,6 +194,12 @@ VALUES (1, 'Myocardial infarction', 4329847),
        (15, 'Moderate to severe liver disease', 4026136),
        (15, 'Moderate to severe liver disease', 4277276),
        (16, 'Metastatic solid tumor', 432851),
+       (16, 'Metastatic solid tumor', 4201930),
+       (16, 'Metastatic solid tumor', 4205430),
+       (16, 'Metastatic solid tumor', 4264861),
+       (16, 'Metastatic solid tumor', 4264288),
+       (16, 'Metastatic solid tumor', 4246703),
+       (16, 'Metastatic solid tumor', 763131),
        (17, 'AIDS', 4013106),
        (17, 'AIDS', 439727)
 ;
@@ -677,6 +683,69 @@ LEFT JOIN
 
 DROP TABLE IF EXISTS @cohort_database_schema.charlson_map;
 CREATE TABLE @cohort_database_schema.charlson_map AS
+SELECT DISTINCT * 
+FROM (
+  SELECT DISTINCT COALESCE(diag_category_id, 0) as diag_category_id,
+                  COALESCE (weight, 0) as weight,
+                  c.cohort_definition_id,
+                  c.subject_id,
+                  c.cohort_start_date
+  FROM (SELECT concepts.diag_category_id, score.weight, cohort.subject_id, cohort.cohort_definition_id
+  	FROM 
+  	@cohort_database_schema.@cohort_table cohort
+  	INNER JOIN @cdm_database_schema.condition_era condition_era
+  		ON cohort.subject_id = condition_era.person_id
+  	INNER JOIN @cohort_database_schema.charlson_concepts concepts
+  		ON condition_era.condition_concept_id = concepts.concept_id
+  	INNER JOIN @cohort_database_schema.charlson_scoring score
+  		ON concepts.diag_category_id = score.diag_category_id
+  	WHERE condition_era_start_date <= cohort.cohort_start_date	
+  	) temp
+  	RIGHT JOIN @cohort_database_schema.@cohort_table c
+  		ON c.subject_id = temp.subject_id and c.cohort_definition_id=temp.cohort_definition_id
+  	
+  	UNION ALL
+  	
+  	-- cancer modifiers
+  	SELECT DISTINCT
+          16 AS diag_category_id,
+          6 AS weight, 
+          cohort.cohort_definition_id,
+          cohort.subject_id, 
+          cohort_start_date
+  	FROM @cohort_database_schema.@cohort_table cohort
+  	INNER JOIN @cdm_database_schema.measurement meas
+  		ON cohort.subject_id = meas.person_id
+  	WHERE meas.measurement_date <= cohort.cohort_start_date
+      AND measurement_concept_id IN (
+          SELECT DISTINCT ca.descendant_concept_id
+          FROM @cdm_database_schema.concept_ancestor ca
+            WHERE ca.ancestor_concept_id IN (36769180, 1635142)
+            )
+            
+    UNION ALL
+  
+  	-- metastasis measurement
+  	SELECT distinct
+          16 AS diag_category_id,
+          6 AS weight, 
+          cohort.cohort_definition_id,
+          cohort.subject_id, 
+          cohort_start_date
+  	FROM @cohort_database_schema.@cohort_table cohort
+  	INNER JOIN @cdm_database_schema.measurement meas
+  		ON cohort.subject_id = meas.person_id
+  	WHERE meas.measurement_date <= cohort.cohort_start_date
+      AND measurement_concept_id IN (
+          SELECT DISTINCT ca.descendant_concept_id
+          FROM @cdm_database_schema.concept_ancestor ca
+            WHERE ca.ancestor_concept_id IN (3006575)
+            )
+      AND value_as_concept_id in (45878386, 45881618, 45882500, 45876322)
+	);
+		
+		
+
 SELECT DISTINCT COALESCE(diag_category_id, 0) as diag_category_id,
                 COALESCE (weight, 0) as weight,
                 c.cohort_definition_id,
@@ -691,12 +760,12 @@ FROM (SELECT concepts.diag_category_id, score.weight, cohort.subject_id, cohort.
 		ON condition_era.condition_concept_id = concepts.concept_id
 	INNER JOIN @cohort_database_schema.charlson_scoring score
 		ON concepts.diag_category_id = score.diag_category_id
-	WHERE condition_era_start_date < cohort.cohort_start_date	
+	WHERE condition_era_start_date <= cohort.cohort_start_date	
 	) temp
 	RIGHT JOIN @cohort_database_schema.@cohort_table c
 		ON c.subject_id = temp.subject_id and c.cohort_definition_id=temp.cohort_definition_id;
-
-
+		
+		
 -- Update weights to avoid double counts of mild/severe course of the disease
 -- Diabetes
 UPDATE @cohort_database_schema.charlson_map
