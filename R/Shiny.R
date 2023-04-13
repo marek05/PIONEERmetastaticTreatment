@@ -16,9 +16,7 @@
 
 #' @export
 launchShinyApp <- function(outputFolder, 
-                           shinySettings = list(storage = "filesystem", 
-                                                dataFolder = outputFolder, 
-                                                dataFile = paste0("study_results_", databaseId, ".zip", ))) 
+                           databaseId = "") 
 {
   ensure_installed("shiny")
   ensure_installed("shinydashboard")
@@ -28,6 +26,10 @@ launchShinyApp <- function(outputFolder,
   ensure_installed("VennDiagram")
   ensure_installed("htmltools")
   ensure_installed("pool")
+  shinySettings = list(storage = "filesystem", 
+                       dataFolder = outputFolder, 
+                       dataFile = paste0("study_results_", databaseId, ".zip"))
+  
   appDir <- system.file("shiny/PioneerMetastaticTreatmentExplorer", package = getThisPackageName(), mustWork = TRUE)
   .GlobalEnv$shinySettings <- shinySettings
   on.exit(rm(shinySettings, envir = .GlobalEnv))
