@@ -198,10 +198,6 @@ runCohortDiagnostics(connectionDetails = connectionDetails,
           useBulkCharacterization = useBulkCharacterization,
           minCellCount = minCellCount)
 # 
-# 
-# # Use the next set of commands to compress results
-# # and view the output.
-# preMergeResultsFiles(outputFolder)
 # launchShinyApp(outputFolder)
 # 
 # 
