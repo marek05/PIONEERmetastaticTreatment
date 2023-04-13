@@ -18,7 +18,7 @@
 launchShinyApp <- function(outputFolder, 
                            shinySettings = list(storage = "filesystem", 
                                                 dataFolder = outputFolder, 
-                                                dataFile = "study_results.zip")) 
+                                                dataFile = paste0("study_results_", databaseId, ".zip", ))) 
 {
   ensure_installed("shiny")
   ensure_installed("shinydashboard")

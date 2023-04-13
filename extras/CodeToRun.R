@@ -146,9 +146,6 @@ useBulkCharacterization <- TRUE
 cohortIdsToExcludeFromExecution <- c()
 cohortIdsToExcludeFromResultsExport <- NULL
 
-# For uploading the results. You should have received the key file from the study coordinator, input the correct path here:
-keyFileName <- "study-data-site-pioneer"
-userName <- "study-data-site-pioneer"
 
 # Run cohort diagnostics -----------------------------------
 runCohortDiagnostics(connectionDetails = connectionDetails,
@@ -179,7 +176,7 @@ runCohortDiagnostics(connectionDetails = connectionDetails,
 # 
 # 
 # # Use this to run the study. The results will be stored in a zip file called
-# # 'Results_<databaseId>.zip in the outputFolder.
+# # 'study_results_<databaseId>.zip in the outputFolder.
  runStudy(connectionDetails = connectionDetails,
           cdmDatabaseSchema = cdmDatabaseSchema,
           cohortDatabaseSchema = cohortDatabaseSchema,
@@ -197,11 +194,8 @@ runCohortDiagnostics(connectionDetails = connectionDetails,
           incremental = TRUE,
           useBulkCharacterization = useBulkCharacterization,
           minCellCount = minCellCount)
-# 
-# launchShinyApp(outputFolder)
-# 
-# 
-# # When finished with reviewing the results, use the next command
-# # upload study results to OHDSI SFTP server:
-# uploadStudyResults(outputFolder, keyFileName, userName)
+ 
+# launchShinyApp(outputFolder, databaseId)
+
+ 
 

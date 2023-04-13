@@ -568,7 +568,7 @@ runStudy <- function(connectionDetails = NULL,
   # ParallelLogger::logInfo(paste("Running study took",
   #                               signif(delta, 3),
   #                               attr(delta, "units")))
-  Andromeda::saveAndromeda(andrData, file.path(exportFolder, "study_results.zip"))
+  Andromeda::saveAndromeda(andrData, file.path(exportFolder, paste0("study_results_", databaseId, ".zip")))
   
 
 }
