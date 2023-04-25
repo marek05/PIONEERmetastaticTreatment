@@ -181,7 +181,8 @@ dashboardPage(
       tags$script(src = "js/lib/js.cookie.js"),
       tags$script(src = "js/charybdis.js"),
       tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"),
-      tags$script(src = "js/pathways.js")
+      tags$script(src = "js/pathways.js"),
+      tags$script(src = "js/saveSvgAsPng.js")
     ),
     ### changing theme
     tabItems(
@@ -274,6 +275,7 @@ dashboardPage(
                    div(
                      h5('Treatment Switch Pathways'),
                      div(class = 'sankey-container',
+                        actionButton("save_plot", "Save plot"), 
                         uiOutput("pathwaysD3"),
                         dataTableOutput("sankeyTable")
                         )
