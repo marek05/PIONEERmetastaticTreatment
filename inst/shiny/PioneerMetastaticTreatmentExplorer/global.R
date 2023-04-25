@@ -67,7 +67,7 @@ if (dataStorage == "database") {
 } else {
   if (file.exists(file.path(dataFolder, dataFile))) {
     writeLines("Reading data using Andromeda")
-    andrData <- Andromeda::loadAndromeda(file.path(dataFolder, 'study_results.zip'))
+    andrData <- Andromeda::loadAndromeda(file.path(dataFolder, shinySettings$dataFile))
     
   } else {
     zipFiles <- list.files(dataFolder, pattern = ".zip", full.names = TRUE)

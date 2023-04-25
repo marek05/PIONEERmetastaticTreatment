@@ -424,14 +424,12 @@ $(document).ready(function(){
         link.attr("d", path);
       }
   });
-  
-  console.log('test')
-  
+
   d3.select("#save_plot")
     .on('click', function(){
     // Get the d3js SVG element and save using saveSvgAsPng.js
     saveSvgAsPng(document.getElementById('pathwaysD3').getElementsByTagName('svg')[0],
-                 'test_plot.png', 
+                 document.getElementById('treatmentPatternsHeader').innerHTML + '.png', 
                  {backgroundColor: "#FFFFFF"});
   })
 });
