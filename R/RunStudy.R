@@ -405,20 +405,20 @@ runStudy <- function(connectionDetails = NULL,
   metrics <- metrics %>% dplyr::mutate(databaseId = databaseId) 
   andrData$metrics_distribution <- metrics
 
-  # # drop treatment complementary tables
-  # sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
-  #                                          sqlFilename = "TreatmentTablesDrop.sql",
-  #                                          packageName = getThisPackageName(),
-  #                                          warnOnMissingParameters = TRUE,
-  #                                          cohort_database_schema = cohortDatabaseSchema
-  #                                         )
-  # DatabaseConnector::executeSql(connection, sql)
-  # 
-  # sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
-  #                                          sqlFilename = file.path("quartiles", "RemoveComplementaryTables.sql"),
-  #                                          packageName = getThisPackageName(),
-  #                                          cohort_database_schema = cohortDatabaseSchema)
-  # DatabaseConnector::executeSql(connection, sql)
+  # drop treatment complementary tables
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = "TreatmentTablesDrop.sql",
+                                           packageName = getThisPackageName(),
+                                           warnOnMissingParameters = TRUE,
+                                           cohort_database_schema = cohortDatabaseSchema
+                                          )
+  DatabaseConnector::executeSql(connection, sql)
+
+  sql <- SqlRender::loadRenderTranslateSql(dbms = connection@dbms,
+                                           sqlFilename = file.path("quartiles", "RemoveComplementaryTables.sql"),
+                                           packageName = getThisPackageName(),
+                                           cohort_database_schema = cohortDatabaseSchema)
+  DatabaseConnector::executeSql(connection, sql)
   
   # Counting cohorts -----------------------------------------------------------------------
   ParallelLogger::logInfo("Counting cohorts")

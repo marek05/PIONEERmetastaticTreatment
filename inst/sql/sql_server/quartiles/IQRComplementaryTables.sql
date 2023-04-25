@@ -745,27 +745,6 @@ FROM (
 	);
 		
 		
-
-SELECT DISTINCT COALESCE(diag_category_id, 0) as diag_category_id,
-                COALESCE (weight, 0) as weight,
-                c.cohort_definition_id,
-                c.subject_id,
-                c.cohort_start_date
-FROM (SELECT concepts.diag_category_id, score.weight, cohort.subject_id, cohort.cohort_definition_id
-	FROM 
-	@cohort_database_schema.@cohort_table cohort
-	INNER JOIN @cdm_database_schema.condition_era condition_era
-		ON cohort.subject_id = condition_era.person_id
-	INNER JOIN @cohort_database_schema.charlson_concepts concepts
-		ON condition_era.condition_concept_id = concepts.concept_id
-	INNER JOIN @cohort_database_schema.charlson_scoring score
-		ON concepts.diag_category_id = score.diag_category_id
-	WHERE condition_era_start_date <= cohort.cohort_start_date	
-	) temp
-	RIGHT JOIN @cohort_database_schema.@cohort_table c
-		ON c.subject_id = temp.subject_id and c.cohort_definition_id=temp.cohort_definition_id;
-		
-		
 -- Update weights to avoid double counts of mild/severe course of the disease
 -- Diabetes
 UPDATE @cohort_database_schema.charlson_map
