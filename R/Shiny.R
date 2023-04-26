@@ -26,9 +26,10 @@ launchShinyApp <- function(outputFolder,
   ensure_installed("VennDiagram")
   ensure_installed("htmltools")
   ensure_installed("pool")
+  if (databaseId != "") {databaseId = paste0("_", databaseId)}
   shinySettings = list(storage = "filesystem", 
                        dataFolder = outputFolder, 
-                       dataFile = paste0("study_results_", databaseId, ".zip"))
+                       dataFile = paste0("study_results", databaseId, ".zip"))
   
   appDir <- system.file("shiny/PioneerMetastaticTreatmentExplorer", package = getThisPackageName(), mustWork = TRUE)
   .GlobalEnv$shinySettings <- shinySettings
