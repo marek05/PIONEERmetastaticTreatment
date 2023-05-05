@@ -191,7 +191,7 @@ FROM tab
 WHERE cohort_definition_id IN (@treatment_cohort_ids)
   AND cohort_end_date >= drug_exposure_start_date
   AND cohort_start_date <= drug_exposure_start_date
-  AND DATEDIFF(day, cohort_start_date, cohort_end_date) > 183
+--  AND DATEDIFF(day, cohort_start_date, cohort_end_date) > 183
 ORDER BY cohort_definition_id, person_id, drug_exposure_start_date;
 
 
@@ -221,6 +221,12 @@ FROM (
                    MIN(drug_exposure_start_date) AS after_first_exposure, cohort_start_date, cohort_end_date
             FROM @cohort_database_schema.treatment_tagged tp
             WHERE drug_exposure_start_date > DATEADD(day, 183, cohort_start_date)
+            GROUP BY cohort_definition_id, person_id, codeset_tag, cohort_start_date, cohort_end_date
+            UNION
+            SELECT cohort_definition_id AS after_cohort_id, person_id AS after_person_id, 'censored' AS after_codeset_tag,
+	                 MAX(drug_exposure_start_date) AS after_first_exposure, cohort_start_date, cohort_end_date
+            FROM @cohort_database_schema.treatment_tagged tt
+            WHERE DATEDIFF(day, cohort_start_date, cohort_end_date) <= 183
             GROUP BY cohort_definition_id, person_id, codeset_tag, cohort_start_date, cohort_end_date
             ) after
       ON before.before_person_id = after.after_person_id
