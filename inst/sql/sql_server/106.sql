@@ -147,6 +147,23 @@ UNION  select c.concept_id
   and c.invalid_reason is null
 
 ) I
+) C UNION ALL 
+SELECT 14 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (40239056,963987,1344381,40222431,19010792,1361291,19058410,1315942,42900250,1356461,35807385,35807349,19089810,1366310,1351541,44816340,1500211,1300978,1315286,45892579,1378382,36880201,36885115,43173544,36247443,44175744,42963146,44081458,44082527,46276408,46276411,36788005,36788004,35803678,36889553,36889599,36238934,45775578,902727,43526934,739471,35834903,1718850,40224095,40224096,35604050,35604051,40224086,36224401,41079944,35604048,35604049,1343039)
+UNION  select c.concept_id
+  from @vocabulary_database_schema.CONCEPT c
+  join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+  and ca.ancestor_concept_id in (40239056,963987,1344381,40222431,19010792,1361291,19058410,1315942,42900250,1356461,35807385,35807349,19089810,1366310,1351541,44816340,1500211,1300978,1315286,45892579,1378382,36880201,36885115,43173544,36247443,44175744,42963146,44081458,44082527,46276408,46276411,36788005,36788004,35803678,36889553,36889599,36238934,45775578,902727,43526934,739471,35834903,1718850,40224095,40224096,35604050,35604051,40224086,36224401,41079944,35604048,35604049,1343039)
+  and c.invalid_reason is null
+
+) I
+LEFT JOIN
+(
+  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (41267222)
+
+) E ON I.concept_id = E.concept_id
+WHERE E.concept_id is null
 ) C
 ;
 
@@ -1497,6 +1514,57 @@ HAVING COUNT(cc.event_id) = 0
 ) Results
 ;
 
+select 4 as inclusion_rule_id, person_id, event_id
+INTO #Inclusion_4
+FROM 
+(
+  select pe.person_id, pe.event_id
+  FROM #qualified_events pe
+  
+JOIN (
+-- Begin Criteria Group
+select 0 as index_id, person_id, event_id
+FROM
+(
+  select E.person_id, E.event_id 
+  FROM #qualified_events E
+  INNER JOIN
+  (
+    -- Begin Correlated Criteria
+select 0 as index_id, p.person_id, p.event_id
+from #qualified_events p
+LEFT JOIN (
+SELECT p.person_id, p.event_id 
+FROM #qualified_events P
+JOIN (
+  -- Begin Drug Exposure Criteria
+select C.person_id, C.drug_exposure_id as event_id, C.drug_exposure_start_date as start_date,
+       COALESCE(C.DRUG_EXPOSURE_END_DATE, DATEADD(day,C.DAYS_SUPPLY,DRUG_EXPOSURE_START_DATE), DATEADD(day,1,C.DRUG_EXPOSURE_START_DATE)) as end_date,
+       C.visit_occurrence_id,C.drug_exposure_start_date as sort_date
+from 
+(
+  select de.* 
+  FROM @cdm_database_schema.DRUG_EXPOSURE de
+JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 14)
+) C
+
+
+-- End Drug Exposure Criteria
+
+) A on A.person_id = P.person_id  AND A.START_DATE >= P.OP_START_DATE AND A.START_DATE <= P.OP_END_DATE AND A.START_DATE >= P.OP_START_DATE AND A.START_DATE <= DATEADD(day,-1,P.START_DATE) ) cc on p.person_id = cc.person_id and p.event_id = cc.event_id
+GROUP BY p.person_id, p.event_id
+HAVING COUNT(cc.event_id) = 0
+-- End Correlated Criteria
+
+  ) CQ on E.person_id = CQ.person_id and E.event_id = CQ.event_id
+  GROUP BY E.person_id, E.event_id
+  HAVING COUNT(index_id) = 1
+) G
+-- End Criteria Group
+) AC on AC.person_id = pe.person_id AND AC.event_id = pe.event_id
+) Results
+;
+
 SELECT inclusion_rule_id, person_id, event_id
 INTO #inclusion_events
 FROM (select inclusion_rule_id, person_id, event_id from #Inclusion_0
@@ -1505,7 +1573,9 @@ select inclusion_rule_id, person_id, event_id from #Inclusion_1
 UNION ALL
 select inclusion_rule_id, person_id, event_id from #Inclusion_2
 UNION ALL
-select inclusion_rule_id, person_id, event_id from #Inclusion_3) I;
+select inclusion_rule_id, person_id, event_id from #Inclusion_3
+UNION ALL
+select inclusion_rule_id, person_id, event_id from #Inclusion_4) I;
 TRUNCATE TABLE #Inclusion_0;
 DROP TABLE #Inclusion_0;
 
@@ -1517,6 +1587,9 @@ DROP TABLE #Inclusion_2;
 
 TRUNCATE TABLE #Inclusion_3;
 DROP TABLE #Inclusion_3;
+
+TRUNCATE TABLE #Inclusion_4;
+DROP TABLE #Inclusion_4;
 
 
 with cteIncludedEvents(event_id, person_id, start_date, end_date, op_start_date, op_end_date, ordinal) as
@@ -1531,7 +1604,7 @@ with cteIncludedEvents(event_id, person_id, start_date, end_date, op_start_date,
   ) MG -- matching groups
 
   -- the matching group with all bits set ( POWER(2,# of inclusion rules) - 1 = inclusion_rule_mask
-  WHERE (MG.inclusion_rule_mask = POWER(cast(2 as bigint),4)-1)
+  WHERE (MG.inclusion_rule_mask = POWER(cast(2 as bigint),5)-1)
 
 )
 select event_id, person_id, start_date, end_date, op_start_date, op_end_date
