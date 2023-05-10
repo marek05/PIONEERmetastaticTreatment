@@ -4396,7 +4396,7 @@
 							"UseEventEnd" : false
 						},
 						"RestrictVisit" : false,
-						"IgnoreObservationPeriod" : false,
+						"IgnoreObservationPeriod" : true,
 						"Occurrence" : {
 							"Type" : 0,
 							"Count" : 0,
