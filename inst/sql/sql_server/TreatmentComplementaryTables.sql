@@ -162,7 +162,6 @@ FROM (
 
 
 -- assign drug tag to each drug_exposure instead of individual drug concept_ids 
--- TODO add analysis for number of patients less that 183 days in cohort
 DROP TABLE IF EXISTS @cohort_database_schema.treatment_tagged;
 
 CREATE TABLE @cohort_database_schema.treatment_tagged(
@@ -186,13 +185,55 @@ WITH tab AS(
       ON cs.concept_id = de.drug_concept_id
       )
 INSERT INTO @cohort_database_schema.treatment_tagged
-SELECT * 
+SELECT DISTINCT * 
 FROM tab 
 WHERE cohort_definition_id IN (@treatment_cohort_ids)
   AND cohort_end_date >= drug_exposure_start_date
   AND cohort_start_date <= drug_exposure_start_date
---  AND DATEDIFF(day, cohort_start_date, cohort_end_date) > 183
 ORDER BY cohort_definition_id, person_id, drug_exposure_start_date;
+
+
+-- Add orchiectomy procedure info as a ADT treatment to treatment_tagged table
+DROP TABLE IF EXISTS @cohort_database_schema.adt_proc;
+CREATE TABLE @cohort_database_schema.adt_proc(
+  cohort_definition_id int, 
+  person_id bigint,
+  codeset_tag varchar,
+  drug_exposure_start_date date,
+  cohort_start_date date,
+  cohort_end_date date
+);
+
+
+WITH tab AS(
+  SELECT coh.cohort_definition_id, pr.person_id,
+         'ADT' as codeset_tag, pr.procedure_date as drug_exposure_start_date,
+         coh.cohort_start_date,
+         coh.cohort_end_date
+  FROM @cdm_database_schema.PROCEDURE_OCCURRENCE pr
+  JOIN @cohort_database_schema.@cohort_table coh
+      ON pr.person_id = coh.subject_id
+  WHERE procedure_concept_id in (4012324, 4304921, 4073141, 4071936, 4073142, 4073143, 2103796, 2109975, 2109976,
+                                44512827, 4314682, 4286887, 4341536, 4145907))
+SELECT DISTINCT * 
+FROM tab 
+WHERE cohort_definition_id IN (@treatment_cohort_ids)
+  AND cohort_end_date >= drug_exposure_start_date
+  AND cohort_start_date <= drug_exposure_start_date;
+
+
+INSERT INTO @cohort_database_schema.adt_proc 
+SELECT cohort_definition_id, person_id, codeset_tag, 
+       dateadd(day, 184, cohort_start_date) as drug_exposure_start_date, cohort_start_date, cohort_end_date
+FROM  @cohort_database_schema.adt_proc
+WHERE drug_exposure_start_date < dateadd(day, 184, cohort_start_date)
+  AND datediff(day, cohort_start_date, cohort_end_date) >= 184 ;
+
+INSERT INTO @cohort_database_schema.treatment_tagged
+SELECT * 
+FROM @cohort_database_schema.adt_proc;
+
+DROP TABLE IF EXISTS @cohort_database_schema.adt_proc;
 
 
 -- collect initial treatment patterns info
