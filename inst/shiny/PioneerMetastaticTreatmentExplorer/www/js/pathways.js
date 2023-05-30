@@ -395,7 +395,7 @@ $(document).ready(function(){
         .attr("height", function(d) { return d.dy; })
         .attr("width", sankey.nodeWidth())
         .style("fill", function(d) {
-    		    return d.color = color(d.id.replace(/ .*/, "")); })
+            return d.color = color(d.name); })
         .style("stroke", function(d) {
     		    return d3.rgb(d.color).darker(2); })
         .append("title")
