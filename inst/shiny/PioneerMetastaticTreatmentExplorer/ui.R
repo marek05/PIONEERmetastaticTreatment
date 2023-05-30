@@ -197,7 +197,7 @@ dashboardPage(
       tabItem(tabName = "cohortCounts",
               htmltools::withTags(
                 addInfo(
-                  div(class="download-container",
+                  div(class = "download-container",
                       shinyWidgets::dropdownButton(
                         inputId = "cohortCountsDownload",
                         label = "Download",
@@ -245,7 +245,7 @@ dashboardPage(
               
       ),
       
-      tabItem (tabName = "metricsDistribution",
+      tabItem(tabName = "metricsDistribution",
                h4(textOutput('metricsHeader')),
                dataTableOutput("metricsTable")
       ),
@@ -277,6 +277,7 @@ dashboardPage(
                      div(class = 'sankey-container',
                         actionButton("save_plot", "Save plot"), 
                         uiOutput("pathwaysD3"),
+                        downloadButton("dlSankeyData", "Download Sankey Table"),
                         dataTableOutput("sankeyTable")
                         )
                      )

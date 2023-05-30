@@ -758,6 +758,18 @@ shinyServer(function(input, output, session) {
   
   
   #Sankey Table
+  output$dlSankeyData <- downloadHandler(
+    filename = function() {
+      paste0(paste(input$targetTreatmentPatterns, input$strataTreatmentPatterns, sep = " "), "_Sankey.csv")
+    },
+    content = function(file) {
+      dlSankeyData <- sankeyData() %>% 
+        dplyr::select(sourceName, targetName, value) %>% 
+        dplyr::arrange(sourceName, desc(value))
+      write.csv(dlSankeyData, file)
+    }
+  )
+  
   output$sankeyTable <- renderDataTable({
     DT::datatable(
     sankeyData() %>% 
