@@ -89,6 +89,7 @@
 						"DemographicCriteriaList" : [],
 						"Groups" : []
 					},
+					"CodesetId" : 9,
 					"First" : true,
 					"OccurrenceStartDate" : {
 						"Value" : "2016-01-01",

@@ -212,7 +212,7 @@ from
 (
   select de.* , row_number() over (PARTITION BY de.person_id ORDER BY de.drug_exposure_start_date, de.drug_exposure_id) as ordinal
   FROM @cdm_database_schema.DRUG_EXPOSURE de
-
+JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 9)
 ) C
 
 WHERE (C.drug_exposure_start_date >= DATEFROMPARTS(2016, 1, 1) and C.drug_exposure_start_date <= DATEFROMPARTS(2020, 12, 31))
@@ -235,7 +235,7 @@ from
 (
   select de.* , row_number() over (PARTITION BY de.person_id ORDER BY de.drug_exposure_start_date, de.drug_exposure_id) as ordinal
   FROM @cdm_database_schema.DRUG_EXPOSURE de
-
+JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 9)
 ) C
 
 WHERE (C.drug_exposure_start_date >= DATEFROMPARTS(2016, 1, 1) and C.drug_exposure_start_date <= DATEFROMPARTS(2020, 12, 31))
@@ -259,7 +259,7 @@ from
 (
   select de.* , row_number() over (PARTITION BY de.person_id ORDER BY de.drug_exposure_start_date, de.drug_exposure_id) as ordinal
   FROM @cdm_database_schema.DRUG_EXPOSURE de
-
+JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 9)
 ) C
 
 WHERE (C.drug_exposure_start_date >= DATEFROMPARTS(2016, 1, 1) and C.drug_exposure_start_date <= DATEFROMPARTS(2020, 12, 31))
@@ -302,7 +302,7 @@ from
 (
   select de.* , row_number() over (PARTITION BY de.person_id ORDER BY de.drug_exposure_start_date, de.drug_exposure_id) as ordinal
   FROM @cdm_database_schema.DRUG_EXPOSURE de
-
+JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 9)
 ) C
 
 WHERE (C.drug_exposure_start_date >= DATEFROMPARTS(2016, 1, 1) and C.drug_exposure_start_date <= DATEFROMPARTS(2020, 12, 31))
