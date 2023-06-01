@@ -342,9 +342,7 @@ runStudy <- function(connectionDetails = NULL,
     sqlFilename = file.path("quartiles", "AgeAtDiagnosis.sql"),
     packageName = getThisPackageName(),
     warnOnMissingParameters = TRUE,
-    cohort_database_schema = cohortDatabaseSchema,
-    cohort_table = cohortTable,
-    target_ids = paste(targetIds, collapse = ', '))
+    cohort_database_schema = cohortDatabaseSchema)
   sql <- paste0(sql, sqlAggreg)
   metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
 
@@ -362,9 +360,7 @@ runStudy <- function(connectionDetails = NULL,
     sqlFilename = file.path("quartiles", "CharlsonAtDiagnosis.sql"),
     packageName = getThisPackageName(),
     warnOnMissingParameters = TRUE,
-    cohort_database_schema = cohortDatabaseSchema,
-    cohort_table = cohortTable,
-    target_ids = paste(targetIds, collapse = ', '))
+    cohort_database_schema = cohortDatabaseSchema)
   sql <- paste0(sql, sqlAggreg)
   metrics <- rbind(metrics, DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = T))
   
