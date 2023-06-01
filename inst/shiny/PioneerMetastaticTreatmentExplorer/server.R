@@ -332,7 +332,7 @@ shinyServer(function(input, output, session) {
 
     color_map <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
     names(color_map) <- sort(KMIds$name)
-    
+
     plot <- ggsurvplot_core(
       targetIdTimeToEventData,
       risk.table = "nrisk_cumcensor",
@@ -731,21 +731,32 @@ shinyServer(function(input, output, session) {
       dplyr::filter(databaseId %in% !!input$databasesTreatmentPatterns, cohortId %in% !!cohortIdTreatmentPatterns()) %>%
       dplyr::pull(cohortId)
     
-    sankeyData <- andrData$treatment_sankey %>%
-      dplyr::filter(cohortId == target_id, databaseId == !!input$databasesTreatmentPatterns) %>%
-      dplyr::collect()
-    sankeyData
+    if (length(target_id) == 0) {
+      count <- 0
+    }
+    else{
+      count <- andrData$cohort_count %>% dplyr::filter(cohortId == target_id) %>% dplyr::pull(cohortEntries)
+    }
+    
+    if (count > 30) {
+      sankeyData <- andrData$treatment_sankey %>%
+        dplyr::filter(cohortId == target_id, databaseId == !!input$databasesTreatmentPatterns) %>%
+        dplyr::collect()
+      return(sankeyData)
+    }
+    return(data.frame())
   })
   
-  #Sankey
+  # Sankey
   sendSankeyData <- function(){
-    jsonData <- jsonlite::toJSON(sankeyData(), pretty = TRUE)
+    data <- sankeyData()
+    jsonData <- jsonlite::toJSON(data, pretty = TRUE)
     session$sendCustomMessage(type = "jsondata", jsonData)
   }
 
   
   observeEvent(input$databasesTreatmentPatterns, {
-      sendSankeyData()
+    sendSankeyData()
   })
 
   observeEvent(input$targetTreatmentPatterns, {
@@ -771,11 +782,17 @@ shinyServer(function(input, output, session) {
   )
   
   output$sankeyTable <- renderDataTable({
-    DT::datatable(
-    sankeyData() %>% 
-      dplyr::select(sourceName, targetName, value) %>% 
-      dplyr::arrange(sourceName, desc(value)),
-    options = list(pageLength = 25))
+    data <- sankeyData()
+    if(nrow(data > 30)){
+      DT::datatable(
+        data %>% 
+          dplyr::select(sourceName, targetName, value) %>% 
+          dplyr::arrange(sourceName, desc(value)),
+        options = list(pageLength = 25))
+    }
+    else(
+      DT::datatable(data)
+    )
   })
   
   
