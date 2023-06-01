@@ -685,11 +685,11 @@ DROP TABLE IF EXISTS @cohort_database_schema.charlson_map;
 CREATE TABLE @cohort_database_schema.charlson_map AS
 SELECT DISTINCT * 
 FROM (
-  SELECT DISTINCT COALESCE(diag_category_id, 0) as diag_category_id,
-                  COALESCE (weight, 0) as weight,
-                  c.cohort_definition_id,
-                  c.subject_id,
-                  c.cohort_start_date
+  SELECT COALESCE(diag_category_id, 0) as diag_category_id,
+         COALESCE (weight, 0) as weight,
+         c.cohort_definition_id,
+         c.subject_id,
+         c.cohort_start_date
   FROM (SELECT concepts.diag_category_id, score.weight, cohort.subject_id, cohort.cohort_definition_id
   	FROM 
   	@cohort_database_schema.@cohort_table cohort
@@ -707,7 +707,7 @@ FROM (
   	UNION ALL
   	
   	-- cancer modifiers
-  	SELECT DISTINCT
+  	SELECT 
           16 AS diag_category_id,
           6 AS weight, 
           cohort.cohort_definition_id,
@@ -718,7 +718,7 @@ FROM (
   		ON cohort.subject_id = meas.person_id
   	WHERE meas.measurement_date <= cohort.cohort_start_date
       AND measurement_concept_id IN (
-          SELECT DISTINCT ca.descendant_concept_id
+          SELECT ca.descendant_concept_id
           FROM @cdm_database_schema.concept_ancestor ca
             WHERE ca.ancestor_concept_id IN (36769180, 1635142)
             )
@@ -726,7 +726,7 @@ FROM (
     UNION ALL
   
   	-- metastasis measurement
-  	SELECT distinct
+  	SELECT 
           16 AS diag_category_id,
           6 AS weight, 
           cohort.cohort_definition_id,
@@ -737,7 +737,7 @@ FROM (
   		ON cohort.subject_id = meas.person_id
   	WHERE meas.measurement_date <= cohort.cohort_start_date
       AND measurement_concept_id IN (
-          SELECT DISTINCT ca.descendant_concept_id
+          SELECT ca.descendant_concept_id
           FROM @cdm_database_schema.concept_ancestor ca
             WHERE ca.ancestor_concept_id IN (3006575)
             )
